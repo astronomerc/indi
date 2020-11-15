@@ -293,7 +293,7 @@
         </device>
         <device label="MyFocuserPro2" manufacturer="DIY">
             <driver name="MyFocuserPro2">indi_myfocuserpro2_focus</driver>
-            <version>0.6</version>
+            <version>0.7</version>
         </device>
         <device label="DeepSkyDad AF1" manufacturer="DeepSkyDad">
             <driver name="DeepSkyDad AF1">indi_deepskydad_af1_focus</driver>
@@ -325,6 +325,18 @@
         </device>
         <device label="Pegasus DMFC" manufacturer="Pegasus Astro">
             <driver name="Pegasus DMFC">indi_dmfc_focus</driver>
+            <version>1.0</version>
+        </device>
+        <device label="Pyxis" manufacturer="Optec">
+            <driver name="Pyxis">indi_pyxis_rotator</driver>
+            <version>1.0</version>
+        </device>
+        <device label="Pegasus Falcon" manufacturer="Pegasus Astro">
+            <driver name="Pegasus Falcon">indi_falcon_rotator</driver>
+            <version>1.0</version>
+        </device>
+        <device label="Rotator Simulator" manufacturer="Simulator">
+            <driver name="Rotator Simulator">indi_simulator_rotator</driver>
             <version>1.0</version>
         </device>
         <device label="Microtouch">
@@ -501,10 +513,6 @@
         </device>
         <device label="SnapCap" manufacturer="DIY">
             <driver name="SnapCap">indi_snapcap</driver>
-            <version>1.0</version>
-        </device>
-        <device label="Pyxis" manufacturer="Optec">
-            <driver name="Pyxis">indi_pyxis_rotator</driver>
             <version>1.0</version>
         </device>
         <device label="Arduino ST4" manufacturer="DIY">

@@ -338,6 +338,7 @@ ENDIF(OGGTHEORA_FOUND)
 
     SET(libstream_CXX_SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/streammanager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/fpsmeter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/recorder/recorderinterface.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/recorder/recordermanager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/recorder/serrecorder.cpp
@@ -372,7 +373,6 @@ ENDIF(OGGTHEORA_FOUND)
 ENDIF(UNIX)
 
 SET(libdsp_C_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/dsp/align.c
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dsp/buffer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dsp/convert.c
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dsp/fft.c
@@ -1148,6 +1148,19 @@ ENDIF ()
 ######## Rotator GROUP #########
 #####################################
 
+################ Rotator Simulator ########
+
+SET(rotatorsim_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/rotator/rotator_simulator.cpp)
+
+IF (UNITY_BUILD)
+    ENABLE_UNITY_BUILD(rotatorsim rotatorsim_SRC 10 cpp)
+ENDIF ()
+
+add_executable(indi_simulator_rotator ${rotatorsim_SRC})
+target_link_libraries(indi_simulator_rotator indidriver)
+install(TARGETS indi_simulator_rotator RUNTIME DESTINATION bin)
+
 ################ Optec Gemini Focusing Rotator ########
 
 SET(gemini_SRC
@@ -1178,6 +1191,16 @@ SET(pyxis_SRC
 add_executable(indi_pyxis_rotator ${pyxis_SRC})
 target_link_libraries(indi_pyxis_rotator indidriver)
 install(TARGETS indi_pyxis_rotator RUNTIME DESTINATION bin)
+
+
+################ Falcon Rotator ################
+
+SET(falcon_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/rotator/pegasus_falcon.cpp)
+
+add_executable(indi_falcon_rotator ${falcon_SRC})
+target_link_libraries(indi_falcon_rotator indidriver)
+install(TARGETS indi_falcon_rotator RUNTIME DESTINATION bin)
 
 ################ Integra85 Focusing Rotator ################
 
@@ -1762,6 +1785,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libindi.pc DESTINATION ${PKGCONFIG_INS
 if (UNIX)
     INSTALL(FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/streammanager.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/fpsmeter.h
             ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/jpegutils.h
             ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/ccvt.h
             ${CMAKE_CURRENT_SOURCE_DIR}/libs/stream/ccvt_types.h
