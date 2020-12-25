@@ -322,7 +322,7 @@ void IDLog(const char *fmt, ...)
 double time_ns()
 {
     struct timespec ts;
-#ifdef __MACH__ // OS X does not have clock_gettime, use clock_get_time
+#ifdef __APPLE__ // OS X does not have clock_gettime, use clock_get_time
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
@@ -1712,9 +1712,7 @@ double rad2as(double rad)
 
 double estimate_distance(double parsecs, double parallax_radius)
 {
-    double cat1 = parallax_radius * cos(as2rad(parsecs));
-    double cat2 = parallax_radius * sin(as2rad(parsecs));
-    return sqrt(pow(cat1, 2)+pow(cat2, 2));
+    return parallax_radius / sin(as2rad(parsecs));
 }
 
 double m2au(double m)
@@ -1747,31 +1745,28 @@ double estimate_absolute_magnitude(double delta_dist, double delta_mag)
     return sqrt(delta_dist) * delta_mag;
 }
 
-double* interferometry_uv_coords_vector(double baseline_m, double wavelength, double *target_vector)
+double* baseline_2d_projection(double alt, double az, double *baseline, double wavelength)
 {
-    double* uv = (double*)malloc(sizeof(double) * 2);
-    double* vector = (double*)malloc(sizeof(double) * 3);
-    double hypo = sqrt(pow(target_vector[0], 2) * pow(target_vector[1], 2) * pow(target_vector[2], 2));
-    vector[0] = target_vector[0] / hypo;
-    vector[1] = target_vector[1] / hypo;
-    vector[2] = target_vector[2] / hypo;
-    uv[0] = baseline_m * target_vector[0] * target_vector[2];
-    uv[1] = baseline_m * target_vector[1] * target_vector[2];
-    uv[0] *= AIRY / wavelength;
-    uv[1] *= AIRY / wavelength;
-    return uv;
+    double* proj = (double*)malloc(sizeof(double) * 2);
+    az *= M_PI / 180.0;
+    alt *= M_PI / 180.0;
+    proj[0] = (baseline[0] * sin(az) + baseline[1] * cos(az));
+    proj[1] = (baseline[1] * sin(alt) * sin(az) - baseline[0] * sin(alt) * cos(az) + baseline[2] * cos(alt));
+    proj[0] *= AIRY / wavelength;
+    proj[1] *= AIRY / wavelength;
+    return proj;
 }
 
-double* interferometry_uv_coords_hadec(double ha, double dec, double *baseline, double wavelength)
+double baseline_delay(double alt, double az, double *baseline)
 {
-    double* uv = (double*)malloc(sizeof(double) * 2);
-    ha *= M_PI / 12.0;
-    dec *= M_PI / 180.0;
-    uv[0] = (baseline[0] * sin(ha) + baseline[1] * cos(ha));
-    uv[1] = (-baseline[0] * sin(dec) * cos(ha) + baseline[1] * sin(dec) * sin(ha) + baseline[2] * cos(dec));
-    uv[0] *= AIRY / wavelength;
-    uv[1] *= AIRY / wavelength;
-    return uv;
+    double* proj = (double*)malloc(sizeof(double) * 2);
+    az *= M_PI / 180.0;
+    alt *= M_PI / 180.0;
+    proj[0] = (baseline[0] * cos(az) + baseline[1] * sin(az));
+    proj[1] = (baseline[1] * cos(alt) * cos(az) - baseline[0] * cos(alt) * sin(az) + baseline[2] * sin(alt));
+    double d = sqrt(pow(proj[0], 2)+pow(proj[1], 2));
+    free (proj);
+    return d;
 }
 
 #if defined(_MSC_VER)
